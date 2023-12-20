@@ -1,0 +1,33 @@
+version: '3'
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "85:80"
+    volumes:
+      - ./nginx-config:/etc/nginx/conf.d
+    depends_on:
+      - java-app
+    networks:
+      - my-network
+
+  java-app:
+    image: openjdk:17
+    working_dir: /app
+    ports:
+      - "81:8080"
+    volumes:
+      - ./megatron-api:/app
+      - ./db:/app/db
+    environment:
+      - spring.config.import=optional:file:./megatron-api/application.properties
+    command: sh -c "java -jar megatron-api-0.0.1.jar"
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
+
+
+
